@@ -1,0 +1,97 @@
+--Question 1: Create table Customers,Agent and Orders. Use primary key for each tables and foreign keys for connecting the tables.Use Comments while creating the tables.
+
+/*Creating agent table*/
+CREATE TABLE AGENT( 
+AGENT_CODE CHAR(4) PRIMARY KEY, 
+AGENT_NAME VARCHAR(20) NOT NULL, 
+COUNTRY VARCHAR(20) NOT NULL, 
+PHONE_NO BIGINT UNSIGNED NOT NULL, 
+STATUS ENUM('0','1') NOT NULL); 
+
+/*Creating customer table*/
+CREATE TABLE CUSTOMER( 
+CUST_CODE CHAR(4) PRIMARY KEY, 
+CUST_NAME VARCHAR(20) NOT NULL, 
+CUST_CITY VARCHAR(20) NOT NULL, 
+PHONE_NO BIGINT UNSIGNED NOT NULL, 
+AGENT_CODE CHAR(4) NOT NULL);
+
+/*Adding agent foreign key to customer table*/ 
+ALTER TABLE CUSTOMER 
+ADD CONSTRAINT FOREIGN KEY (AGENT_CODE) 
+REFERENCES AGENT(AGENT_CODE);
+
+/*Creating order table*/
+CREATE TABLE ORDERS( 
+ORDER_NUM CHAR(4) PRIMARY KEY, 
+CUST_CODE CHAR(4) NOT NULL, 
+AGENT_CODE CHAR(4) NOT NULL, 
+AMOUNT INT UNSIGNED NOT NULL, 
+ORDER_DATE DATE NOT NULL);
+
+/*Adding customer foreign key to order table*/ 
+ALTER TABLE ORDERS 
+ADD CONSTRAINT FOREIGN KEY (CUST_CODE) 
+REFERENCES CUSTOMER(CUST_CODE);
+
+/*Adding agent foreign key to order table*/
+ALTER TABLE ORDERS 
+ADD CONSTRAINT FOREIGN KEY (AGENT_CODE) 
+REFERENCES AGENT(AGENT_CODE)
+
+/*Inserting values into agent table*/
+INSERT INTO AGENT VALUES
+('A001','Joe','Canada',2345623452,'0'),
+('A002','Sara','India',1234567890,'1'),
+('A003','Wiley','Bahamas',987654321,'1'),
+('A004','Katniss','Ireland',3456543698,'1'),
+('A005','Arjun','India',9844342345,'0');
+
+/*Inserting values into customer table*/
+INSERT INTO CUSTOMER VALUES
+('C001','Albert','Chennai',9798865876,'A001'),
+('C002','Ravi','Bangalore',9876123456,'A002'),
+('C003','Archana','Chennai',94523098123,'A004'),
+('C004','Riya','Trichy',9612309876,'A002'),
+('C005','Pavithra','Kanyakumari',9612309856,'A005');
+
+/*Inserting values into order table*/
+INSERT INTO ORDERS VALUES
+('O001','C001','A001',5000,'2021-2-12'),
+'O002','C002','A002',3000,'2021-03-26'),
+('O003','C005','A004',25000,'2021-01-21'),
+('O004','C003','A003',6000,'2021-03-06'),
+('O006','C004','A005',100000,'2019-09-13');
+
+--Question 2: Alter the table agent , Add a new Column called "Commission".
+
+/*Adding commission column to the agent table*/
+ALTER TABLE AGENT 
+ADD COLUMN COMMISSION FLOAT NOT NULL;
+
+/*Inserting values into commision table*/
+UPDATE AGENT SET COMMISSION = 0.2 WHERE AGENT_CODE='A001';
+UPDATE AGENT SET COMMISSION = 0.96 WHERE AGENT_CODE='A002';
+UPDATE AGENT SET COMMISSION = 0.23 WHERE AGENT_CODE='A003';
+UPDATE AGENT SET COMMISSION = 0.12 WHERE AGENT_CODE='A004';
+UPDATE AGENT SET COMMISSION = 0.76 WHERE AGENT_CODE='A005';
+
+--Question 3: Delete the column Phone_No from the agents table.
+
+ALTER TABLE AGENT DROP COLUMN PHONE_NO;
+
+--Question 4: Rename the Column "Commision" as "Commision_Percentage".
+
+ALTER TABLE AGENT CHANGE COLUMN COMMISSION COMMISSION_PERCENTAGE FLOAT NOT NULL;
+
+--Question 5: Make a copy of agent table with a table name as "AGENT_DETAILS" and delete the old agent table with the name "AGENT" 
+
+CREATE TABLE AGENT_DETAILS AS SELECT * FROM AGENT;
+
+--Question 6: Delete all the order table records in a single command 
+
+TRUNCATE ORDERS;
+
+--Question 7: Alter the tables orders and set a default value for the column Amount
+
+ALTER TABLE ORDERS MODIFY COLUMN AMOUNT INT NOT NULL DEFAULT 0;
