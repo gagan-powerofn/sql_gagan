@@ -1,0 +1,80 @@
+--Creating student table
+CREATE TABLE STUDENT(
+ID CHAR(4) PRIMARY KEY,
+NAME VARCHAR(20),
+DEPARTMENT VARCHAR(5),
+CGPA FLOAT);
+
+--Inserting values into student table
+INSERT INTO STUDENT VALUES
+('S001','ARUN','CS',8), 
+('S002','GITA','CS',7.5), 
+('S003','KUMAR','IT',6), 
+('S004','ROHIT','IT',8.5), 
+('S005','YAMUNA','ECE',9), 
+('S006','YOGESH','ECE',9); 
+  
+--Creating company table    
+CREATE TABLE COMPANY(
+ID CHAR(4) PRIMARY KEY,
+NAME VARCHAR(20),
+LOCATION VARCHAR(20),
+INTERVIEW_DATE DATE);
+
+--Inserting values into company table
+INSERT INTO COMPANY VALUES
+('C002','AMAZON','CHENNAI','2020-09-10'),
+('C003','FLIPKART','BANGALORE','2020-09-15'),
+('C004','HONEYWELL','HYDERABAD','2020-10-30'),
+('C005','ACCENTURE','CHENNAI','2020-11-30'),
+('C006','WIPRO','NOIDA','2020-12-31');
+
+--Creating placement table
+CREATE TABLE PLACEMENTS(
+S_ID CHAR(4),
+C_ID CHAR(4) NOT NULL,
+    -> PACKAGE INT UNSIGNED NOT NULL);
+
+--Inserting values into placement table    
+INSERT INTO PLACEMENTS VALUES ('S001','C001',
+2000000 ),('S002','C001',2000000 ),('S003','C002',1200000), ('S004'
+,'C004',700000), ('S004','C006',400000), ('S006','C004',700000);
+
+--Question 1: Write a SQL query to find student who got placed with highest package, along with the name of the company.
+
+SELECT STUDENT.NAME, COMPANY.NAME AS COMPANY, PLACEMENTS.PACKAGE FROM PLACEMENTS 
+JOIN STUDENT ON PLACEMENTS.S_ID = STUDENT.ID 
+JOIN COMPANY ON PLACEMENTS.C_ID = COMPANY.ID 
+WHERE PACKAGE = (SELECT MAX(PACKAGE) FROM PLACEMENTS);
+
+--Question 2: HOD of ECE department wants to know placement details of all his department students, Write a SQL query for this scenario
+
+SELECT STUDENT.NAME, STUDENT.DEPARTMENT, IF(STUDENT.ID IN (SELECT S_ID FROM PLACEMENTS JOIN STUDENT ON PLACEMENTS.S_ID = STUDENT.ID), "YES", "NO") AS PLACED, COMPANY.NAME AS COMPANY,PLACEMENTS.PACKAGE FROM STUDENT LEFT JOIN PLACEMENTS ON STUDENT.ID=PLACEMENTS.S_ID LEFT JOIN COMPANY  ON PLACEMENTS.C_ID=COMPANY.ID WHERE STUDENT.DEPARTMENT='ECE' ORDER BY STUDENT.NAME;
+
+--Question 3: Write a SQL query to display total number of students each company has hired
+
+SELECT COMPANY.NAME, COUNT(PLACEMENTS.PACKAGE) FROM PLACEMENTS JOIN COMPANY ON PLACEMENTS.C_ID = COMPANY.ID GROUP BY COMPANY.NAME;
+
+--Question 4: Write a SQL query which displays list of companies conducted interview in month of september
+
+SELECT UPPER(MONTHNAME(INTERVIEW_DATE)) AS MONTH, NAME AS COMANY FROM COMPANY WHERE
+ MONTH(INTERVIEW_DATE)=9;
+ 
+--Question 5: Write a SQL query which displays list of companies which conducted interview till date
+
+SELECT COMPANY.NAME AS COMPANY, INTERVIEW_DATE AS DATE  FROM COMPANY WHERE INTERVIEW_DATE <= CURRENT_DATE();
+
+--Question 6: Dean would like to know the students who got more than one placement offer, write a SQL query for this scenario
+
+SELECT STUDENT.NAME AS STUDENT, COMPANY.NAME AS COMPANY FROM STUDENT JOIN PLACEMENTS ON PLACEMENTS.S_ID=STUDENT.ID JOIN COMPANY ON PLACEMENTS.C_ID=COMPANY.ID WHERE PLACEMENTS.S_ID=(SELECT S_ID FROM PLACEMENTS GROUP BY S_ID HAVING COUNT(*)>1);
+
+--Question 7: Accenture would like to shortlist candidates with CGPA > 7 and no need of student who already got placed, write SQL query that statisfies their given criteria
+
+SELECT NAME AS STUDENT, DEPARTMENT, CGPA FROM STUDENT WHERE ID NOT IN (SELECT S_ID FROM PLACEMENTS JOIN STUDENT ON PLACEMENTS.S_ID = STUDENT.ID);
+
+--Question 8: Yamuna decided that she will attend the interview of companies who's location name starts with 'B', write a query that gets the list of company she can attend
+
+SELECT COMPANY.NAME,COMPANY.LOCATION FROM COMPANY WHERE LOCATION LIKE 'B%';
+
+
+
