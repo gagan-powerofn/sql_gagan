@@ -1,0 +1,20 @@
+CREATE TABLE DEVICES(
+TIME1 DATETIME,
+DEVICE CHAR(2),
+CONSUMPTION DECIMAL(4,3));
+
+--Question 1: Upload the CSV data via CLI into the database
+LOAD DATA LOCAL INFILE '/home/gagan/data.csv' INTO TABLE DEVICES FIELDS TERM
+INATED BY ',';
+
+--Question 2: Find all the duplicate time entries for respective devices.
+SELECT DEVICE, TIME1,COUNT(TIME1) AS OCCURRENCE FROM DEVICES GROUP BY DEVICE,TIME1 HAVING COUNT(TIME1)>1;
+
+--Question 3: Find all the missing timestamps for respective devices.
+with MYTABLE as ( select TIME as minn,row_number() over (partition by HOUR(TIME) order by TIME)-MINUTE(TIME) as rowdif from USECASE_3 where DEVICE='D2') select timestampadd(MINUTE,rowdif-1,minn) from MYTABLE where rowdif!=1;
+
+--Question 4: Find the hour-wise cumulative consumption of each device.
+SELECT DEVICE, HOUR(TIME1) , SUM(CONSUMPTION) FROM DEVICES GROUP BY HOUR(TIME1), DEVICE;
+
+--Queston 5: Find the peak consumption reached in a given time range for all the devices.
+SELECT DEVICE,MAX(CONSUMPTION) FROM DEVICES WHERE TIME1 BETWEEN '2020-01-01 00:00:00' AND '2020-01-01 00:37:00' GROUP BY DEVICE;
